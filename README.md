@@ -35,6 +35,7 @@ A curated, *TypeScript*-friendly [collection](./src/) of utilities:
   * **[iterable](./src#iterable)** - make plain objects iterable as `Object.entries(object)` pairs, without touching objects that are already iterable
   * **[json-callback](./src#json-callback)** - stringify callbacks for JSON payloads, normalizing method shorthand to named `function` form
   * **[json-storage](./src#json-storage)** - JSON-aware, iterable, Map-like `localStorage` / `sessionStorage` facade with [Map `put`](#map-put-convention)
+  * **[libwabt](./src#libwabt)** - bootstrap the original WABT `libwabt.js` in place to parse, test, and convert WAT ↔ WASM with no extra files
   * **[map](./src#map)** - native `Map` subclass with [Map `put`](#map-put-convention)
   * **[plain-tag](./src#plain-tag)** - transform a generic template tag into a plain string
   * **[python-tag](./src#python-tag)** - bootstrap Pyodide or MicroPython and run Python via a template tag, a string call, or a bound options tag

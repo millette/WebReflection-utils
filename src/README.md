@@ -1051,6 +1051,53 @@ fine (`JSON.stringify(null)` is `"null"`). If `stringify` returns `null` or
 key instead of writing — so a later `get` is `undefined` and `has` is `false`.
 
 
+## libwabt
+
+A drop-in bootstrap of the original
+[`libwabt.js`](https://github.com/WebAssembly/wabt) from the WebAssembly Binary
+Toolkit. No *npm* package tracks the latest demo build, so this wrapper
+re-packages the files WABT already publishes after its Emscripten demo build.
+The WASM binary is shipped as a compressed base64 payload and decoded at
+runtime, so there is nothing extra to fetch, land on disk, or compile by hand.
+
+The default export is async: it instantiates the module and returns the same
+`parseWat` / `readWasm` API as upstream. From there WAT can be compiled to WASM,
+WASM can be printed back as WAT, modules can be validated, and the resulting
+binary can be instantiated for tests.
+
+```js
+import libwabt from '@webreflection/utils/libwabt';
+
+const wabt = await libwabt();
+
+const wat = wabt.parseWat(
+  'add.wat',
+  `(module
+    (func (export "add") (param i32 i32) (result i32)
+      local.get 0
+      local.get 1
+      i32.add))`
+);
+
+wat.validate();
+
+const { buffer } = wat.toBinary({ log: true, write_debug_names: true });
+const { instance: { exports } } = await WebAssembly.instantiate(buffer);
+exports.add(1, 2); // 3
+wat.destroy();
+
+const wasm = wabt.readWasm(buffer, { readDebugNames: true });
+console.log(wasm.toText({ foldExprs: false, inlineExport: false }));
+wasm.destroy();
+```
+
+Any extra argument is forwarded to the upstream loader except `locateFile`,
+which this wrapper owns so the inlined binary is used. Call `destroy()` on each
+parsed module when it is no longer needed. Upstream files keep their original
+[Apache 2.0](https://github.com/WebAssembly/wabt/blob/main/LICENSE) license and
+credits.
+
+
 ## map
 
 A native `Map` subclass with one extra method: `put(key, value)`. It stores the

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script type="module">
+    import libwabt from '../src/libwabt/index.js';
+    import dedent from '../src/dedent.js';
+
+    const wabt = await libwabt();
+
+    const features = {};
+
+    const module = wabt.parseWat(
+      'test.wast',
+      dedent`
+        (module
+          (func $i (import "my_namespace" "imported_func") (param i32))
+          (func (export "exported_func")
+            i32.const 42
+            call $i))
+      `.trim(),
+      features
+    );
+    module.validate(features);
+
+    const importObject = {
+      my_namespace: { imported_func: arg => console.log(arg) },
+    };
+
+    const { instance: { exports } } = await WebAssembly.instantiate(module.toBinary({log: true, write_debug_names: true}).buffer, importObject);
+    exports.exported_func();
+  </script>
+</head>
+</html>
