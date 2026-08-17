@@ -1093,7 +1093,10 @@ wasm.destroy();
 
 Any extra argument is forwarded to the upstream loader except `locateFile`,
 which this wrapper owns so the inlined binary is used. Call `destroy()` on each
-parsed module when it is no longer needed. Upstream files keep their original
+parsed module when it is no longer needed. For the common parse / validate /
+instantiate loop, [wat-tag](#wat-tag) binds `features`, `init`, and `import`
+once and returns a template tag that also disposes via `using` or
+`[Symbol.dispose]()`. Upstream files keep their original
 [Apache 2.0](https://github.com/WebAssembly/wabt/blob/main/LICENSE) license and
 credits.
 
@@ -1579,6 +1582,66 @@ export default module;
 ```
 
 Because the sticky logic is intentionally simple, using a "*first come, first served*" global symbol lookup, avoid storing sensitive values there directly when secrecy or module-level isolation matters.
+
+
+## wat-tag
+
+A [libwabt](#libwabt) wrapper that returns an async template tag after options
+are bound once. Pass `features`, `init`, and `import` (plus optional `binary`
+and `name`) to the default export; tagged WAT is then [dedent](#dedent)ed after
+[plain-tag](#plain-tag) interpolation, parsed, validated, and instantiated.
+
+```js
+import watTag from '@webreflection/utils/wat-tag';
+
+const wat = watTag({
+  import: {
+    my_namespace: {
+      imported_func: arg => console.log(arg),
+    },
+  },
+});
+
+const result = await wat`
+  (module
+    (func $i (import "my_namespace" "imported_func") (param i32))
+    (func (export "exported_func")
+      i32.const 42
+      call $i))
+`;
+
+result.instance.exports.exported_func();
+```
+
+Each invoke returns the `WebAssembly.instantiate` result (`module` and
+`instance`) plus a dispose method that calls WABT's `module.destroy()`. Use
+`using` where `Symbol.dispose` is available, or dispose explicitly:
+
+```js
+import dispose from '@webreflection/utils/patch/dispose';
+
+{
+  using result = await wat`
+    (module
+      (func (export "add") (param i32 i32) (result i32)
+        local.get 0
+        local.get 1
+        i32.add))
+  `;
+  result.instance.exports.add(1, 2); // 3
+}
+
+// or destroy the parsed module by hand:
+const result = await wat`
+  (module (func (export "nop")))
+`;
+result.instance.exports.nop();
+result[dispose]();
+```
+
+`init` is forwarded to [libwabt](#libwabt) when the tag is created. `features`
+go to `parseWat` / `validate`, `binary` to `toBinary`, `import` to
+`WebAssembly.instantiate`, and `name` defaults to `'test.wast'`.
 
 
 ## weak

@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script type="module">
+    import watTag from '../src/wat-tag.js';
+
+    const wat = watTag({
+      import: {
+        my_namespace: {
+          imported_func: arg => console.log(arg),
+        },
+      },
+    });
+
+    {
+      using result = await wat`
+        (module
+          (func $i (import "my_namespace" "imported_func") (param i32))
+          (func (export "exported_func")
+            i32.const 42
+            call $i))
+      `;
+
+      result.instance.exports.exported_func();
+    }
+  </script>
+</head>
+</html>
