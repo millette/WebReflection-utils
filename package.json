@@ -61,6 +61,7 @@
     "./signals": "./types/signals.d.ts",
     "./state-signals": "./types/state-signals.d.ts",
     "./sticky": "./types/sticky.d.ts",
+    "./wat-tag": "./types/wat-tag.d.ts",
     "./weak": "./types/weak.d.ts",
     "./weak-map": "./types/weak/map.d.ts",
     "./weak/map": "./types/weak/map.d.ts",
@@ -325,6 +326,10 @@
     "./sticky": {
       "types": "./types/sticky.d.ts",
       "import": "./src/sticky.js"
+    },
+    "./wat-tag": {
+      "types": "./types/wat-tag.d.ts",
+      "import": "./src/wat-tag.js"
     },
     "./weak": {
       "types": "./types/weak.d.ts",

@@ -1,8 +1,11 @@
 // @ts-check
 
+import dispose from './patch/dispose.js';
 import libwabt from './libwabt/index.js';
 import plain from './plain-tag.js';
 import dedent from './dedent.js';
+
+const { assign } = Object;
 
 /**
  * @typedef {Object} WatOptions
@@ -29,14 +32,20 @@ export default (options = {}) => {
     const features = options.features ?? {};
     const wabt = await lib;
     // @ts-ignore
-    wabt.parseWat(
+    const module = wabt.parseWat(
       options.name ?? 'test.wast',
       dedent(plain(template, ...values)).trim(),
       features
     );
-    // @ts-ignore
     module.validate(features);
-    // @ts-ignore
-    return WebAssembly.instantiate(module.toBinary(options.binary ?? {}).buffer, importObject);
+    return assign(
+      // @ts-ignore
+      await WebAssembly.instantiate(module.toBinary(options.binary ?? {}).buffer, importObject),
+      {
+        [dispose]() {
+          module.destroy();
+        }
+      }
+    );
   };
 };

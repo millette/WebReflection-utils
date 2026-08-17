@@ -6,17 +6,25 @@
   <script type="module">
     import watTag from '../src/wat-tag.js';
 
-    const wat = watTag();
+    const wat = watTag({
+      import: {
+        my_namespace: {
+          imported_func: arg => console.log(arg),
+        },
+      },
+    });
 
-    const { instance: { exports } } = await wat`
-      (module
-        (func $i (import "my_namespace" "imported_func") (param i32))
-        (func (export "exported_func")
-          i32.const 42
-          call $i))
-    `;
+    {
+      using result = await wat`
+        (module
+          (func $i (import "my_namespace" "imported_func") (param i32))
+          (func (export "exported_func")
+            i32.const 42
+            call $i))
+      `;
 
-    exports.exported_func();
+      result.instance.exports.exported_func();
+    }
   </script>
 </head>
 </html>

@@ -35,7 +35,7 @@ A curated, *TypeScript*-friendly [collection](./src/) of utilities:
   * **[iterable](./src#iterable)** - make plain objects iterable as `Object.entries(object)` pairs, without touching objects that are already iterable
   * **[json-callback](./src#json-callback)** - stringify callbacks for JSON payloads, normalizing method shorthand to named `function` form
   * **[json-storage](./src#json-storage)** - JSON-aware, iterable, Map-like `localStorage` / `sessionStorage` facade with [Map `put`](#map-put-convention)
-  * **[libwabt](./src#libwabt)** - bootstrap the original WABT `libwabt.js` in place to parse, test, and convert WAT ↔ WASM with no extra files
+  * **[libwabt](./src#libwabt)** - bootstrap the original WABT `libwabt.js` in place to parse, test, and convert WAT ↔ WASM with no extra files; [wat-tag](./src#wat-tag) wraps the common compile-and-instantiate path as a template tag
   * **[map](./src#map)** - native `Map` subclass with [Map `put`](#map-put-convention)
   * **[plain-tag](./src#plain-tag)** - transform a generic template tag into a plain string
   * **[python-tag](./src#python-tag)** - bootstrap Pyodide or MicroPython and run Python via a template tag, a string call, or a bound options tag
@@ -47,6 +47,7 @@ A curated, *TypeScript*-friendly [collection](./src/) of utilities:
   * **[signals](./src#signals)** - minimalistic signals with explicit dependency lists; `Object.is` skips same-value writes (`new Signal(v, true)` / `eager` to notify every write): `signal`, `computed`, `batch`, and `effect`
   * **[state-signals](./src#state-signals)** - [signals](./src#signals) plus `create` / `update` / `raw` helpers that turn plain objects into reactive state, with `subscribe` / `unsubscribe` by property key and `dispose` (also via `using`)
   * **[sticky](./src#sticky)** - keep useful values stable once per realm
+  * **[wat-tag](./src#wat-tag)** - [libwabt](./src#libwabt) as a template tag: pass `features`, `init`, and `import` once, then compile WAT and dispose via `using` or `[Symbol.dispose]()`
   * **[weak](./src#weak)** - import both [weakmap](./src#weakmap) and [weakset](./src#weakset) together when both are needed
   * **[weakmap](./src#weakmap)** / `weak-map` - native `WeakMap` subclass with [Map `put`](#map-put-convention)
   * **[weakset](./src#weakset)** / `weak-set` - native `WeakSet` subclass with [Set `put`](#set-put-convention)
